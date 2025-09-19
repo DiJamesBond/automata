@@ -1,52 +1,56 @@
 import java.util.Scanner;
 
 /**
- * Automatons A and B.
+ * Automatons A and B (Part A).
  *
- * TODO 1: Fill in your names and student IDs:
- *
+ * TODO: Fill in your names and student IDs below.
  * @author NAME
- * @id ID
+ * @id     ID
  * @author NAME
- * @id ID
+ * @id     ID
  */
 class ABAutomaton {
-    private static final char OCCUPIED = '*';   
-    private static final char EMPTY = ' ';
+    // Characters used to render a generation
+    private static final char OCCUPIED = '*'; // star denotes occupied (true)
+    private static final char EMPTY    = ' '; // space denotes empty (false)
 
-    Scanner scanner = new Scanner(System.in);
+    // Single Scanner instance for standard input
+    Scanner sc = new Scanner(System.in);
 
     /**
-     * Converts a generation to its textual representation using '*' for occupied and ' ' otherwise.
-     *
-     * @param gen the generation to convert
-     * @return the textual representation of the generation
+     * Converts a generation into a String consisting only of '*' and ' '.
+     * '*' for true (occupied), ' ' for false (empty). Length equals gen.length.
      */
     String genToString(boolean[] gen) {
-        StringBuilder builder = new StringBuilder(gen.length);
+        String boxfilled = "";
         for (int i = 0; i < gen.length; i++) {
-            builder.append(gen[i] ? OCCUPIED : EMPTY);
+            if (gen[i]) {
+                boxfilled = boxfilled + OCCUPIED;
+            } else {
+                boxfilled = boxfilled + EMPTY;
+            }
         }
-        return builder.toString();
+        return boxfilled;
     }
 
     /**
-     * Computes the next generation according to automaton A where edges treat missing neighbors
-     * as empty cells.
-     *
-     * @param current the current generation
-     * @return the next generation following automaton A rules
+     * Computes the next generation using rule set A.
+     * Edges treat missing neighbours as empty (false).
      */
-    boolean[] nextGenA(boolean[] current) {
-        int length = current.length;
-        boolean[] next = new boolean[length];
-        for (int i = 0; i < length; i++) {
-            boolean left = i > 0 && current[i - 1];
-            boolean self = current[i];
-            boolean right = i < length - 1 && current[i + 1];
+    boolean[] nextGenA(boolean[] gen) {
+        int n = gen.length;
+        boolean[] next = new boolean[n];
+
+        for (int i = 0; i < n; i++) {
+            boolean left  = (i > 0) && gen[i - 1];
+            boolean self  = gen[i];
+            boolean right = (i < n - 1) && gen[i + 1];
+
             if (self) {
-                next[i] = left ^ right;
+                // stays occupied iff exactly one neighbour is occupied
+                next[i] = (left && !right) || (!left && right);
             } else {
+                // empty becomes occupied iff at least one neighbour is occupied
                 next[i] = left || right;
             }
         }
@@ -54,81 +58,66 @@ class ABAutomaton {
     }
 
     /**
-     * Computes the next generation according to automaton B where edges treat missing neighbors
-     * as empty cells.
-     *
-     * @param current the current generation
-     * @return the next generation following automaton B rules
+     * Computes the next generation using rule set B.
+     * Edges treat missing neighbours as empty (false).
      */
-    boolean[] nextGenB(boolean[] current) {
-        int length = current.length;
-        boolean[] next = new boolean[length];
-        for (int i = 0; i < length; i++) {
-            boolean left = i > 0 && current[i - 1];
-            boolean self = current[i];
-            boolean right = i < length - 1 && current[i + 1];
+    boolean[] nextGenB(boolean[] gen) {
+        int n = gen.length;
+        boolean[] next = new boolean[n];
+
+        for (int i = 0; i < n; i++) {
+            boolean left  = (i > 0) && gen[i - 1];
+            boolean self  = gen[i];
+            boolean right = (i < n - 1) && gen[i + 1];
+
             if (self) {
+                // stays occupied only if the right neighbour is empty
                 next[i] = !right;
             } else {
-                next[i] = left ^ right;
+                // empty becomes occupied iff exactly one neighbour is occupied
+                next[i] = (left && !right) || (!left && right);
             }
         }
         return next;
     }
 
     /**
-     * Reads the initial generation positions between markers "init_start" and "init_end".
-     * Positions outside the provided length are ignored.
-     *
-     * @param length the length of the generation
-     * @return an array indicating the initially occupied positions
+     * Reads the initial generation between the markers "init_start" and "init_end".
+     * Positions are 1-based in the input; positions > length are ignored.
      */
     boolean[] readInitialGeneration(int length) {
-        boolean[] initial = new boolean[length];
-        scanner.next(); // consume "init_start"
-        while (true) {
-            String token = scanner.next();
-            if ("init_end".equals(token)) {
-                break;
-            }
-            int position = Integer.parseInt(token);
-            if (position >= 1 && position <= length) {
-                initial[position - 1] = true;
+        boolean[] gen = new boolean[length];
+
+        String start = sc.next(); // expects "init_start"
+        // Read integers until a non-integer token ("init_end") occurs
+        while (sc.hasNextInt()) {
+            int p = sc.nextInt();
+            if (p >= 1 && p <= length) {
+                gen[p - 1] = true; // convert 1-based to 0-based index
             }
         }
-        return initial;
+        String end = sc.next(); // consume "init_end"
+        return gen;
     }
 
     /**
-     * Wrapper to preserve the original method name used in run().
-     *
-     * @param length the length of the generation
-     * @return the initial generation array
+     * Program flow as specified by the assignment: read automaton type, length,
+     * number of generations, initial generation, then print G lines while updating.
      */
-    boolean[] readInitalGeneration(int length) {
-        return readInitialGeneration(length);
-    }
-
     void run() {
-        // Read input to configure the automaton
-        String automaton = scanner.next();
-        int genLength = scanner.nextInt();
-        int numOfGens = scanner.nextInt();
-        boolean[] initGen = readInitalGeneration(genLength);
+        String automaton = sc.next();   // "A" or "B"
+        int length = sc.nextInt();      // number of cells (L)
+        int generations = sc.nextInt(); // number of output lines (G)
 
-        // Run the automaton
-        boolean[] gen = initGen;
+        boolean[] gen = readInitialGeneration(length);
 
-        for (int i = 0; i < numOfGens; i++) {
-            // Display the current generation
+        for (int g = 0; g < generations; g++) {
             System.out.println(genToString(gen));
 
-            // And determine the next generation
-            if ("A".equals(automaton)) {
+            if (automaton.equals("A")) {
                 gen = nextGenA(gen);
             } else {
-                // B
-                gen = nextGenB(gen);
+                gen = nextGenB(gen); // assume any non-"A" means "B" as in the template
             }
         }
     }
@@ -137,4 +126,3 @@ class ABAutomaton {
         new ABAutomaton().run();
     }
 }
-
