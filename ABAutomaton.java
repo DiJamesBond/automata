@@ -7,8 +7,8 @@ import java.util.Scanner;
  * 
  * @author NAME
  * @id ID
- * @author NAME
- * @id ID
+ * Sylvi Deng
+ * 2252953
  */
 class ABAutomaton {
     Scanner scanner = new Scanner(System.in);
@@ -61,3 +61,4 @@ class ABAutomaton {
         new ABAutomaton().run();
     }
 }
+
