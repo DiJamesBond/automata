@@ -1,118 +1,115 @@
 import java.util.Scanner;
 
 /**
- * Universal Automaton.
+ * Universal Automaton (Part B).
  *
- * TODO: Fill in your names and student IDs
- *
+ * TODO: Fill in your names and student IDs below.
  * @author NAME
- * @id ID
+ * @id     ID
  * @author NAME
- * @id ID
+ * @id     ID
  */
 class UniversalAutomaton {
-    private static final char OCCUPIED = '*';
-    private static final char EMPTY = ' ';
+    // Characters used to render a generation
+    private static final char OCCUPIED = '*'; // star denotes occupied (true)
+    private static final char EMPTY    = ' '; // space denotes empty (false)
 
-    Scanner scanner = new Scanner(System.in);
+    // Single Scanner instance for standard input
+    Scanner sc = new Scanner(System.in);
 
     /**
-     * Converts a generation to its textual representation using '*' for occupied and ' ' otherwise.
-     *
-     * @param gen the generation to convert
-     * @return the textual representation of the generation
+     * Converts a generation into a String consisting only of '*' and ' '.
+     * '*' for true (occupied), ' ' for false (empty). Length equals gen.length.
      */
     String genToString(boolean[] gen) {
-        StringBuilder builder = new StringBuilder(gen.length);
+        String line = "";
         for (int i = 0; i < gen.length; i++) {
-            builder.append(gen[i] ? OCCUPIED : EMPTY);
+            if (gen[i]) {
+                line = line + OCCUPIED;
+            } else {
+                line = line + EMPTY;
+            }
         }
-        return builder.toString();
+        return line;
     }
 
     /**
-     * Determines the next generation using a provided rule sequence with the edge cells assuming
-     * missing neighbors are empty.
-     *
-     * @param rules   the eight rules for the patterns ordered by (left, self, right) bits
-     * @param current the current generation
-     * @return the next generation produced by the rule sequence
+     * Reads the 8-bit rule sequence as booleans (0 -> false, 1 -> true).
+     * The sequence order is: l s r encoded as bits for indexes 0..7 (000..111).
      */
-    boolean[] nextGen(boolean[] rules, boolean[] current) {
-        int length = current.length;
-        boolean[] next = new boolean[length];
-        for (int i = 0; i < length; i++) {
-            boolean left = i > 0 && current[i - 1];
-            boolean self = current[i];
-            boolean right = i < length - 1 && current[i + 1];
-            int index = (left ? 4 : 0) + (self ? 2 : 0) + (right ? 1 : 0);
-            next[i] = rules[index];
+    boolean[] readRuleSequence() {
+        boolean[] rules = new boolean[8];
+        for (int i = 0; i < 8; i++) {
+            int v = sc.nextInt();
+            rules[i] = (v == 1);
+        }
+        return rules;
+    }
+
+    /**
+     * Reads the initial generation between the markers "init_start" and "init_end".
+     * Positions are 1-based in the input; positions > length are ignored.
+     */
+    boolean[] readInitialGeneration(int length) {
+        boolean[] gen = new boolean[length];
+
+        String start = sc.next(); // expects "init_start"
+        // Read integers until a non-integer token ("init_end") occurs
+        while (sc.hasNextInt()) {
+            int p = sc.nextInt();
+            if (p >= 1 && p <= length) {
+                gen[p - 1] = true; // convert 1-based to 0-based index
+            }
+        }
+        String end = sc.next(); // consume "init_end"
+        return gen;
+    }
+
+    /**
+     * Computes the next generation using the universal rule table.
+     * Each cell's neighbourhood (left, self, right) maps to an index 0..7.
+     * Edges treat missing neighbours as empty (false).
+     */
+    boolean[] nextGen(boolean[] gen, boolean[] rules) {
+        int n = gen.length;
+        boolean[] next = new boolean[n];
+
+        for (int i = 0; i < n; i++) {
+            boolean left  = (i > 0) && gen[i - 1];
+            boolean self  = gen[i];
+            boolean right = (i < n - 1) && gen[i + 1];
+
+            // Build the 3-bit pattern index using only basic constructs
+            int idx = 0;
+            if (left) {
+                idx = idx + 4;
+            }
+            if (self) {
+                idx = idx + 2;
+            }
+            if (right) {
+                idx = idx + 1;
+            }
+
+            next[i] = rules[idx];
         }
         return next;
     }
 
     /**
-     * Reads the initial generation positions between markers "init_start" and "init_end".
-     * Positions outside the provided length are ignored.
-     *
-     * @param length the length of the generation
-     * @return an array indicating the initially occupied positions
+     * Program flow as specified by the assignment: read the rule sequence (8 bits),
+     * then length, number of generations, initial generation, then print and update.
      */
-    boolean[] readInitialGeneration(int length) {
-        boolean[] initial = new boolean[length];
-        scanner.next(); // consume "init_start"
-        while (true) {
-            String token = scanner.next();
-            if ("init_end".equals(token)) {
-                break;
-            }
-            int position = Integer.parseInt(token);
-            if (position >= 1 && position <= length) {
-                initial[position - 1] = true;
-            }
-        }
-        return initial;
-    }
-
-    /**
-     * Wrapper to preserve the original method name used in run().
-     *
-     * @param length the length of the generation
-     * @return the initial generation array
-     */
-    boolean[] readInitalGeneration(int length) {
-        return readInitialGeneration(length);
-    }
-
-    /**
-     * Reads the eight rule bits defining the automaton behaviour.
-     *
-     * @return an array mapping each pattern index to the occupancy of the next generation
-     */
-    boolean[] readRuleSequence() {
-        boolean[] rules = new boolean[8];
-        for (int i = 0; i < 8; i++) {
-            int value = scanner.nextInt();
-            rules[i] = value == 1;
-        }
-        return rules;
-    }
-
     void run() {
-        // Read input to configure the universal automaton
-        boolean[] ruleSequence = readRuleSequence();
-        int generationLength = scanner.nextInt();
-        int numberOfGenerations = scanner.nextInt();
-        boolean[] initGen = readInitalGeneration(generationLength);
+        boolean[] rules = readRuleSequence();
+        int length = sc.nextInt();
+        int generations = sc.nextInt();
 
-        // Run the automaton
-        boolean[] gen = initGen;
+        boolean[] gen = readInitialGeneration(length);
 
-        for (int i = 0; i < numberOfGenerations; i++) {
-            // Display the current generation
+        for (int g = 0; g < generations; g++) {
             System.out.println(genToString(gen));
-            // Determine the next generation
-            gen = nextGen(ruleSequence, gen);
+            gen = nextGen(gen, rules);
         }
     }
 
