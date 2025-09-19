@@ -11,7 +11,7 @@ import java.util.Scanner;
  * @id ID
  */
 class ABAutomaton {
-    private static final char OCCUPIED = '*';
+    private static final char OCCUPIED = '*';   
     private static final char EMPTY = ' ';
 
     Scanner scanner = new Scanner(System.in);
@@ -137,3 +137,4 @@ class ABAutomaton {
         new ABAutomaton().run();
     }
 }
+
