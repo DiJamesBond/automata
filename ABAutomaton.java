@@ -2,35 +2,111 @@ import java.util.Scanner;
 
 /**
  * Automatons A and B.
- * 
+ *
  * TODO 1: Fill in your names and student IDs:
- * 
+ *
  * @author NAME
  * @id ID
- * Sylvi Deng
- * 2252953
+ * @author NAME
+ * @id ID
  */
 class ABAutomaton {
+    private static final char OCCUPIED = '*';
+    private static final char EMPTY = ' ';
+
     Scanner scanner = new Scanner(System.in);
 
+    /**
+     * Converts a generation to its textual representation using '*' for occupied and ' ' otherwise.
+     *
+     * @param gen the generation to convert
+     * @return the textual representation of the generation
+     */
     String genToString(boolean[] gen) {
-        // TODO Implementation
-        return "Hello";
+        StringBuilder builder = new StringBuilder(gen.length);
+        for (int i = 0; i < gen.length; i++) {
+            builder.append(gen[i] ? OCCUPIED : EMPTY);
+        }
+        return builder.toString();
     }
 
-    boolean[] nextGenA(boolean[] gen) {
-        // TODO Implementation
-        return new boolean[] { true, false };
+    /**
+     * Computes the next generation according to automaton A where edges treat missing neighbors
+     * as empty cells.
+     *
+     * @param current the current generation
+     * @return the next generation following automaton A rules
+     */
+    boolean[] nextGenA(boolean[] current) {
+        int length = current.length;
+        boolean[] next = new boolean[length];
+        for (int i = 0; i < length; i++) {
+            boolean left = i > 0 && current[i - 1];
+            boolean self = current[i];
+            boolean right = i < length - 1 && current[i + 1];
+            if (self) {
+                next[i] = left ^ right;
+            } else {
+                next[i] = left || right;
+            }
+        }
+        return next;
     }
 
-    boolean[] nextGenB(boolean[] gen) {
-        // TODO Implementation
-        return new boolean[] { true, false };
+    /**
+     * Computes the next generation according to automaton B where edges treat missing neighbors
+     * as empty cells.
+     *
+     * @param current the current generation
+     * @return the next generation following automaton B rules
+     */
+    boolean[] nextGenB(boolean[] current) {
+        int length = current.length;
+        boolean[] next = new boolean[length];
+        for (int i = 0; i < length; i++) {
+            boolean left = i > 0 && current[i - 1];
+            boolean self = current[i];
+            boolean right = i < length - 1 && current[i + 1];
+            if (self) {
+                next[i] = !right;
+            } else {
+                next[i] = left ^ right;
+            }
+        }
+        return next;
     }
 
+    /**
+     * Reads the initial generation positions between markers "init_start" and "init_end".
+     * Positions outside the provided length are ignored.
+     *
+     * @param length the length of the generation
+     * @return an array indicating the initially occupied positions
+     */
+    boolean[] readInitialGeneration(int length) {
+        boolean[] initial = new boolean[length];
+        scanner.next(); // consume "init_start"
+        while (true) {
+            String token = scanner.next();
+            if ("init_end".equals(token)) {
+                break;
+            }
+            int position = Integer.parseInt(token);
+            if (position >= 1 && position <= length) {
+                initial[position - 1] = true;
+            }
+        }
+        return initial;
+    }
+
+    /**
+     * Wrapper to preserve the original method name used in run().
+     *
+     * @param length the length of the generation
+     * @return the initial generation array
+     */
     boolean[] readInitalGeneration(int length) {
-        // TODO Implementation
-        return new boolean[] { true, false };
+        return readInitialGeneration(length);
     }
 
     void run() {
@@ -61,4 +137,3 @@ class ABAutomaton {
         new ABAutomaton().run();
     }
 }
-
