@@ -17,22 +17,6 @@ public class SudokuSolver {
 
     public SudokuSolver(SudokuGrid grid) {
         this.grid = grid;
-        int[][] initial = {
-            {5, 3, 0, 0, 7, 0, 0, 0, 0},
-            {6, 0, 0, 1, 9, 5, 0, 0, 0},
-            {0, 9, 8, 0, 0, 0, 0, 6, 0},
-            {8, 0, 0, 0, 6, 0, 0, 0, 3},
-            {4, 0, 0, 8, 0, 3, 0, 0, 1},
-            {7, 0, 0, 0, 2, 0, 0, 0, 6},
-            {0, 6, 0, 0, 0, 0, 2, 8, 0},
-            {0, 0, 0, 4, 1, 9, 0, 0, 5},
-            {0, 0, 0, 0, 8, 0, 0, 7, 9}
-        };
-        for (int r = 0; r < SIZE; r++) {
-            for (int c = 0; c < SIZE; c++) {
-                grid.fillCell(r, c, initial[r][c]);
-            }
-        }
     }
 
     /**
@@ -43,7 +27,7 @@ public class SudokuSolver {
     public boolean solve() {
         Point empty = grid.findEmptyCell();
         if (empty == null) {
-            return true;
+            return grid.isValid();
         }
         int row = empty.x;
         int col = empty.y;
@@ -73,6 +57,26 @@ public class SudokuSolver {
     public static void main(String[] args) {
         SudokuGrid grid = new SudokuGrid();
         SudokuSolver solver = new SudokuSolver(grid);
+        solver.loadDefaultPuzzle();
         solver.solveIt();
+    }
+
+    private void loadDefaultPuzzle() {
+        int[][] initial = {
+            {5, 3, 0, 0, 7, 0, 0, 0, 0},
+            {6, 0, 0, 1, 9, 5, 0, 0, 0},
+            {0, 9, 8, 0, 0, 0, 0, 6, 0},
+            {8, 0, 0, 0, 6, 0, 0, 0, 3},
+            {4, 0, 0, 8, 0, 3, 0, 0, 1},
+            {7, 0, 0, 0, 2, 0, 0, 0, 6},
+            {0, 6, 0, 0, 0, 0, 2, 8, 0},
+            {0, 0, 0, 4, 1, 9, 0, 0, 5},
+            {0, 0, 0, 0, 8, 0, 0, 7, 9}
+        };
+        for (int r = 0; r < SIZE; r++) {
+            for (int c = 0; c < SIZE; c++) {
+                grid.fillCell(r, c, initial[r][c]);
+            }
+        }
     }
 }
