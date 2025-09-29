@@ -12,16 +12,13 @@ import java.awt.Point;
  */
 public class SudokuGrid {
     private static final int SIZE = 9;
+    private static final int BOX = 3;
     private static final int DIGIT_RANGE = 9;
 
     private int[][] grid;
-    private int rEmpty;
-    private int cEmpty;
 
     public SudokuGrid() {
         grid = new int[SIZE][SIZE];
-        rEmpty = -1;
-        cEmpty = -1;
     }
 
     /**
@@ -36,8 +33,6 @@ public class SudokuGrid {
                 copy.grid[r][c] = grid[r][c];
             }
         }
-        copy.rEmpty = rEmpty;
-        copy.cEmpty = cEmpty;
         return copy;
     }
 
@@ -50,14 +45,10 @@ public class SudokuGrid {
         for (int r = 0; r < SIZE; r++) {
             for (int c = 0; c < SIZE; c++) {
                 if (grid[r][c] == 0) {
-                    rEmpty = r;
-                    cEmpty = c;
                     return new Point(r, c);
                 }
             }
         }
-        rEmpty = -1;
-        cEmpty = -1;
         return null;
     }
 
@@ -66,7 +57,6 @@ public class SudokuGrid {
      */
     public void print() {
         System.out.println("+-----------------+");
-        int blockSize = SIZE / 3;
         for (int r = 0; r < SIZE; r++) {
             System.out.print("|");
             for (int c = 0; c < SIZE; c++) {
@@ -78,14 +68,14 @@ public class SudokuGrid {
                     symbol = (char) ('0' + value);
                 }
                 System.out.print(symbol);
-                if (c % blockSize == blockSize - 1) {
+                if (c % BOX == BOX - 1) {
                     System.out.print("|");
                 } else {
                     System.out.print(" ");
                 }
             }
             System.out.println();
-            if (r % blockSize == blockSize - 1) {
+            if (r % BOX == BOX - 1) {
                 System.out.println("+-----------------+");
             }
         }
@@ -100,13 +90,6 @@ public class SudokuGrid {
      */
     public void fillCell(int r, int c, int d) {
         grid[r][c] = d;
-        if (d == 0) {
-            rEmpty = r;
-            cEmpty = c;
-        } else if (rEmpty == r && cEmpty == c) {
-            rEmpty = -1;
-            cEmpty = -1;
-        }
     }
 
     /**
@@ -155,16 +138,67 @@ public class SudokuGrid {
     }
 
     private boolean boxConflict(int r, int c, int d) {
-        int blockSize = SIZE / 3;
-        int startRow = (r / blockSize) * blockSize;
-        int startCol = (c / blockSize) * blockSize;
-        for (int row = startRow; row < startRow + blockSize; row++) {
-            for (int col = startCol; col < startCol + blockSize; col++) {
+        int startRow = (r / BOX) * BOX;
+        int startCol = (c / BOX) * BOX;
+        for (int row = startRow; row < startRow + BOX; row++) {
+            for (int col = startCol; col < startCol + BOX; col++) {
                 if (grid[row][col] == d) {
                     return true;
                 }
             }
         }
         return false;
+    }
+
+    /**
+     * Checks whether the current grid has no conflicts while ignoring empty cells.
+     *
+     * @return true if the grid is conflict free, false otherwise
+     */
+    boolean isValid() {
+        for (int r = 0; r < SIZE; r++) {
+            boolean[] seen = new boolean[DIGIT_RANGE + 1];
+            for (int c = 0; c < SIZE; c++) {
+                int value = grid[r][c];
+                if (value == 0) {
+                    continue;
+                }
+                if (seen[value]) {
+                    return false;
+                }
+                seen[value] = true;
+            }
+        }
+        for (int c = 0; c < SIZE; c++) {
+            boolean[] seen = new boolean[DIGIT_RANGE + 1];
+            for (int r = 0; r < SIZE; r++) {
+                int value = grid[r][c];
+                if (value == 0) {
+                    continue;
+                }
+                if (seen[value]) {
+                    return false;
+                }
+                seen[value] = true;
+            }
+        }
+        for (int startRow = 0; startRow < SIZE; startRow += BOX) {
+            for (int startCol = 0; startCol < SIZE; startCol += BOX) {
+                boolean[] seen = new boolean[DIGIT_RANGE + 1];
+                for (int r = startRow; r < startRow + BOX; r++) {
+                    for (int c = startCol; c < startCol + BOX; c++) {
+                        int value = grid[r][c];
+                        if (value == 0) {
+                            continue;
+                        }
+                        if (seen[value]) {
+                            return false;
+                        }
+                        seen[value] = true;
+                    }
+                }
+            }
+        }
+        return true;
     }
 }
