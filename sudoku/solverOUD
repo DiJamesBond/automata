@@ -1,0 +1,118 @@
+/**
+ * SudokuSolver.
+ * 
+ * TODO 4: FIll in your names and student IDs:
+ * 
+ * Luca Bosch
+ * @id ID
+ * Sylvi Deng
+ * 2252953
+ */
+public class SudokuSolver {
+
+    public SudokuSolver(SudokuGrid grid) {
+        // Initialize the SudokuSolver with the provided SudokuGrid
+    }
+
+    public boolean solve() {
+        // Use a recursive strategy to solve the Sudoku puzzle
+
+        for (int r = 0; r < SIZE; r++) {
+            for (int c = 0; c < SIZE; c++) {
+                if (grid[r][c] == 0) {
+                    for (int numberToTry = 1; numberToTry <= SIZE; numberToTry++) {
+                        if ()
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+    
+    public void solveIt() {
+         // Use solve() to solve the puzzle and print the solution or a message if no solution is found
+    }
+
+    public static void main(String[] args) {
+        // Create a SudokuGrid and a SudokuSolver
+    }
+}
+import java.awt.Point;
+
+/**
+ * SudokuSolver.
+ *
+ * TODO 4: FIll in your names and student IDs:
+ *
+ * Luca Bosch
+ * @id ID
+ * Sylvi Deng
+ * 2252953
+ */
+public class SudokuSolver {
+    private static final int SIZE = 9;
+    private static final int DIGIT_RANGE = 9;
+    private SudokuGrid grid;
+
+    public SudokuSolver(SudokuGrid grid) {
+        this.grid = grid;
+        int[][] initial = {
+            {5, 3, 0, 0, 7, 0, 0, 0, 0},
+            {6, 0, 0, 1, 9, 5, 0, 0, 0},
+            {0, 9, 8, 0, 0, 0, 0, 6, 0},
+            {8, 0, 0, 0, 6, 0, 0, 0, 3},
+            {4, 0, 0, 8, 0, 3, 0, 0, 1},
+            {7, 0, 0, 0, 2, 0, 0, 0, 6},
+            {0, 6, 0, 0, 0, 0, 2, 8, 0},
+            {0, 0, 0, 4, 1, 9, 0, 0, 5},
+            {0, 0, 0, 0, 8, 0, 0, 7, 9}
+        };
+        for (int r = 0; r < SIZE; r++) {
+            for (int c = 0; c < SIZE; c++) {
+                grid.fillCell(r, c, initial[r][c]);
+            }
+        }
+    }
+
+    /**
+     * Solves the Sudoku puzzle using recursion with backtracking.
+     *
+     * @return true if a solution was found, false otherwise
+     */
+    public boolean solve() {
+        Point empty = grid.findEmptyCell();
+        if (empty == null) {
+            return true;
+        }
+        int row = empty.x;
+        int col = empty.y;
+        for (int digit = 1; digit <= DIGIT_RANGE; digit++) {
+            if (!grid.givesConflict(row, col, digit)) {
+                grid.fillCell(row, col, digit);
+                if (solve()) {
+                    return true;
+                }
+                grid.fillCell(row, col, 0);
+            }
+        }
+        return false;
+    }
+    
+    /**
+     * Invokes the solver and prints the resulting grid or a failure message.
+     */
+    public void solveIt() {
+        if (solve()) {
+            grid.print();
+        } else {
+            System.out.println("No solution");
+        }
+    }
+
+    public static void main(String[] args) {
+        SudokuGrid grid = new SudokuGrid();
+        SudokuSolver solver = new SudokuSolver(grid);
+        solver.solveIt();
+    }
+}
