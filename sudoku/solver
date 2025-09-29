@@ -6,30 +6,30 @@ import java.awt.Point;
  * TODO 4: FIll in your names and student IDs:
  *
  * Luca Bosch
- * 2201178
+ * @id ID
  * Sylvi Deng
  * 2252953
  */
 public class SudokuSolver {
+    private static final int SIZE = 9;
+    private static final int DIGIT_RANGE = 9;
     private SudokuGrid grid;
 
     public SudokuSolver(SudokuGrid grid) {
         this.grid = grid;
         int[][] initial = {
-            {0,6,0, 0,0,1, 0,9,4},
-            {3,0,0, 0,0,7, 1,0,0},
-            {0,0,0, 0,9,0, 0,0,0},
-
-            {7,0,6, 5,0,0, 2,0,9},
-            {0,3,0, 0,2,0, 0,6,0},
-            {9,0,2, 0,0,6, 3,0,1},
-
-            {0,0,0, 0,5,0, 0,0,0},
-            {0,0,7, 3,0,0, 0,0,2},
-            {4,1,0, 7,0,0, 0,8,0}
+            {5, 3, 0, 0, 7, 0, 0, 0, 0},
+            {6, 0, 0, 1, 9, 5, 0, 0, 0},
+            {0, 9, 8, 0, 0, 0, 0, 6, 0},
+            {8, 0, 0, 0, 6, 0, 0, 0, 3},
+            {4, 0, 0, 8, 0, 3, 0, 0, 1},
+            {7, 0, 0, 0, 2, 0, 0, 0, 6},
+            {0, 6, 0, 0, 0, 0, 2, 8, 0},
+            {0, 0, 0, 4, 1, 9, 0, 0, 5},
+            {0, 0, 0, 0, 8, 0, 0, 7, 9}
         };
-        for (int r = 0; r < SudokuGrid.SIZE; r++) {
-            for (int c = 0; c < SudokuGrid.SIZE; c++) {
+        for (int r = 0; r < SIZE; r++) {
+            for (int c = 0; c < SIZE; c++) {
                 grid.fillCell(r, c, initial[r][c]);
             }
         }
@@ -47,7 +47,7 @@ public class SudokuSolver {
         }
         int row = empty.x;
         int col = empty.y;
-        for (int digit = SudokuGrid.MIN_DIGIT; digit <= SudokuGrid.MAX_DIGIT; digit++) {
+        for (int digit = 1; digit <= DIGIT_RANGE; digit++) {
             if (!grid.givesConflict(row, col, digit)) {
                 grid.fillCell(row, col, digit);
                 if (solve()) {
