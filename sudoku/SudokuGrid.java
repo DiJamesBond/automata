@@ -20,6 +20,9 @@ public class SudokuGrid {
 
     public SudokuGrid() {
         // Initialize the grid and set rEmpty and cEmpty to -1
+        grid = new int[SIZE][SIZE];
+        rEmpty = -1;
+        cEmpty = -1;
     }
 
     public SudokuGrid copy() {
@@ -29,6 +32,17 @@ public class SudokuGrid {
 
     public Point findEmptyCell() {
         // Find the next empty cell in reading order and return its coordinates as a Point
+        for (int r = 0; r < SIZE; r++) {
+            for (int c = 0; c < SIZE; c++) {
+                if (grid[r][c] == 0) {
+                    rEmpty = r;
+                    cEmpty = c;
+                    return new Point(r, c);
+                }
+            }
+        }
+        rEmpty = -1;
+        cEmpty = -1;
         return null;
     }
 
