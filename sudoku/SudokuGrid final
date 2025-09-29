@@ -1,0 +1,244 @@
+import java.awt.Point;
+
+/**
+ * SudokuGrid.
+ *
+ * TODO 4: FIll in your names and student IDs:
+ *
+ * Luca Bosch
+ * 2201178
+ * Sylvi Deng
+ * 2252953
+ */
+public class SudokuGrid {
+    private static final int SIZE = 9;
+    private static final int BOX = 3;
+    private static final int DIGIT_RANGE = 9;
+
+    private int[][] grid;
+
+    /**
+     * Constructs an empty SudokuGrid, initializing all cells to 0.
+     */
+    public SudokuGrid() {
+        // Initialize the grid and set rEmpty and cEmpty to -1
+        grid = new int[SIZE][SIZE];
+    }
+
+    /**
+     * Creates a deep copy of the current SudokuGrid.
+     *
+     * @return A new SudokuGrid object with the same cell values.
+     */
+    public SudokuGrid copy() {
+        // Create a copy of the SudokuGrid and return it
+        SudokuGrid copy = new SudokuGrid();
+        for (int r = 0; r < SIZE; r++) {
+            for (int c = 0; c < SIZE; c++) {
+                copy.grid[r][c] = grid[r][c];
+            }
+        }
+        return copy;
+    }
+
+    /**
+     * Finds the coordinates of the first empty cell (cell with value 0)
+     * when searching in row-major (reading) order.
+     *
+     * @return A {@code Point} object representing the (row, column) of the empty cell,
+     * or {@code null} if the grid is full.
+     */
+    public Point findEmptyCell() {
+        // Find the next empty cell in reading order and return its coordinates as a Point
+        for (int r = 0; r < SIZE; r++) {
+            for (int c = 0; c < SIZE; c++) {
+                if (grid[r][c] == 0) {
+                    return new Point(r, c);
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Prints the current state of the Sudoku grid to the console.
+     * Empty cells (0) are printed as spaces.
+     */
+    public void print() {
+        // Print the Sudoku grid
+        System.out.println("+-----------------+");
+        for (int r = 0; r < SIZE; r++) {
+            System.out.print("|");
+            for (int c = 0; c < SIZE; c++) {
+                int value = grid[r][c];
+                char symbol;
+                if (value == 0) {
+                    symbol = ' ';
+                } else {
+                    symbol = (char) ('0' + value);
+                }
+                System.out.print(symbol);
+                if (c % BOX == BOX - 1) {
+                    System.out.print("|");
+                } else {
+                    System.out.print(" ");
+                }
+            }
+            System.out.println();
+            if (r % BOX == BOX - 1) {
+                System.out.println("+-----------------+");
+            }
+        }
+    }
+
+    /**
+     * Fills the cell at the specified row and column with the given digit.
+     *
+     * @param r The row index (0-8).
+     * @param c The column index (0-8).
+     * @param d The digit (1-9) to place in the cell, or 0 to clear the cell.
+     */
+    public void fillCell(int r, int c, int d) {
+        // Fill the cell at row r and column c
+        grid[r][c] = d;
+    }
+
+    /**
+     * Checks if placing the digit 'd' into the cell at (r, c) creates a conflict
+     * with existing digits in the same row, column, or 3x3 box.
+     *
+     * @param r The row index (0-8).
+     * @param c The column index (0-8).
+     * @param d The digit (1-9) to check for a conflict.
+     * @return {@code true} if a conflict exists, {@code false} otherwise.
+     */
+    public boolean givesConflict(int r, int c, int d) {
+        // Check if filling the number d in the cell at row r and column c causes a conflict
+        if (d == 0) {
+            return false;
+        }
+        if (d < 1 || d > DIGIT_RANGE) {
+            return true;
+        }
+        if (rowConflict(r, d)) {
+            return true;
+        }
+        if (colConflict(c, d)) {
+            return true;
+        }
+        if (boxConflict(r, c, d)) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Checks if the digit 'd' already exists in the specified row 'r' of the grid.
+     *
+     * @param r The row index (0-8).
+     * @param d The digit (1-9) to check for existence.
+     * @return {@code true} if a conflict exists in the row, {@code false} otherwise.
+     */
+    private boolean rowConflict(int r, int d) {
+        // Check if there is a conflict in the row r when filling the number d
+        for (int c = 0; c < SIZE; c++) {
+            if (grid[r][c] == d) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Checks if the digit 'd' already exists in the specified column 'c' of the grid.
+     *
+     * @param c The column index (0-8).
+     * @param d The digit (1-9) to check for existence.
+     * @return {@code true} if a conflict exists in the column, {@code false} otherwise.
+     */
+    private boolean colConflict(int c, int d) {
+        // Check if there is a conflict in the column c when filling the number d
+        for (int r = 0; r < SIZE; r++) {
+            if (grid[r][c] == d) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Checks if the digit 'd' already exists in the 3x3 box that contains the cell (r, c).
+     *
+     * @param r The row index (0-8) of the cell.
+     * @param c The column index (0-8) of the cell.
+     * @param d The digit (1-9) to check for existence.
+     * @return {@code true} if a conflict exists in the box, {@code false} otherwise.
+     */
+    private boolean boxConflict(int r, int c, int d) {
+        // Check if there is a conflict in the 3x3 box containing the cell at row r and column c
+        // when filling the number d
+        int startRow = (r / BOX) * BOX;
+        int startCol = (c / BOX) * BOX;
+        for (int row = startRow; row < startRow + BOX; row++) {
+            for (int col = startCol; col < startCol + BOX; col++) {
+                if (grid[row][col] == d) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Checks if the current grid state is a valid (solved or partially solved) Sudoku configuration.
+     * A grid is valid if no digit (1-9) is repeated within any row, column, or 3x3 box.
+     *
+     * @return {@code true} if the grid is valid, {@code false} otherwise.
+     */
+    boolean isValid() {
+        for (int r = 0; r < SIZE; r++) {
+            boolean[] seen = new boolean[DIGIT_RANGE + 1];
+            for (int c = 0; c < SIZE; c++) {
+                int value = grid[r][c];
+                if (value == 0) {
+                    continue;
+                }
+                if (seen[value]) {
+                    return false;
+                }
+                seen[value] = true;
+            }
+        }
+        for (int c = 0; c < SIZE; c++) {
+            boolean[] seen = new boolean[DIGIT_RANGE + 1];
+            for (int r = 0; r < SIZE; r++) {
+                int value = grid[r][c];
+                if (value == 0) {
+                    continue;
+                }
+                if (seen[value]) {
+                    return false;
+                }
+                seen[value] = true;
+            }
+        }
+        for (int startRow = 0; startRow < SIZE; startRow += BOX) {
+            for (int startCol = 0; startCol < SIZE; startCol += BOX) {
+                boolean[] seen = new boolean[DIGIT_RANGE + 1];
+                for (int r = startRow; r < startRow + BOX; r++) {
+                    for (int c = startCol; c < startCol + BOX; c++) {
+                        int value = grid[r][c];
+                        if (value == 0) {
+                            continue;
+                        }
+                        if (seen[value]) {
+                            return false;
+                        }
+                        seen[value] = true;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+}
