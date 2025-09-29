@@ -1,0 +1,105 @@
+import java.awt.Point;
+
+/**
+ * SudokuSolver.
+ *
+ * TODO 4: FIll in your names and student IDs:
+ *
+ * Luca Bosch
+ * 2201178
+ * Sylvi Deng
+ * 2252953
+ */
+public class SudokuSolver {
+    private static final int SIZE = 9;
+    private static final int DIGIT_RANGE = 9;
+    private SudokuGrid grid;
+
+    /**
+     * Constructs a SudokuSolver with the specified SudokuGrid.
+     *
+     * @param grid The SudokuGrid object to be solved.
+     */
+    public SudokuSolver(SudokuGrid grid) {
+        // Initialize the SudokuSolver with the provided SudokuGrid
+        this.grid = grid;
+    }
+
+    /**
+     * Solves the Sudoku puzzle using a recursive backtracking algorithm.
+     * This method attempts to find a valid digit for the next empty cell
+     * and recursively calls itself until the puzzle is solved.
+     *
+     * @return {@code true} if the puzzle is successfully solved, {@code false} otherwise.
+     */
+    public boolean solve() {
+        // Use a recursive strategy to solve the Sudoku puzzle return false;
+        Point empty = grid.findEmptyCell();
+        if (empty == null) {
+            return grid.isValid();
+        }
+        int row = empty.x;
+        int col = empty.y;
+        for (int digit = 1; digit <= DIGIT_RANGE; digit++) {
+            if (!grid.givesConflict(row, col, digit)) {
+                grid.fillCell(row, col, digit);
+                if (solve()) {
+                    return true;
+                }
+                grid.fillCell(row, col, 0);
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Calls the {@code solve()} method and prints the solution to the console
+     * if found, or prints a "No solution" message otherwise.
+     */
+    public void solveIt() {
+        // Use solve() to solve the puzzle and print the solution or a message if no solution is found
+        if (solve()) {
+            grid.print();
+        } else {
+            System.out.println("No solution");
+        }
+    }
+
+    /**
+     * The main method to run the Sudoku solver program.
+     * It creates a grid, loads a default puzzle, and attempts to solve it.
+     *
+     * @param args Command line arguments (not used).
+     */
+    public static void main(String[] args) {
+        // Create a SudokuGrid and a SudokuSolver
+        SudokuGrid grid = new SudokuGrid();
+        SudokuSolver solver = new SudokuSolver(grid);
+        solver.loadDefaultPuzzle();
+        solver.solveIt();
+    }
+
+    /**
+     * Loads a fixed, predefined Sudoku puzzle into the current grid.
+     */
+    private void loadDefaultPuzzle() {
+        int[][] initial = {
+            {0, 6, 0,  0, 0, 1,  0, 9, 4},
+            {3, 0, 0,  0, 0, 7,  1, 0, 0},
+            {0, 0, 0,  0, 9, 0,  0, 0, 0},
+
+            {7, 0, 6,  5, 0, 0,  2, 0, 9},
+            {0, 3, 0,  0, 2, 0,  0, 6, 0},
+            {9, 0, 2,  0, 0, 6,  3, 0, 1},
+
+            {0, 0, 0,  0, 5, 0,  0, 0, 0},
+            {0, 0, 7,  3, 0, 0,  0, 0, 2},
+            {4, 1, 0,  7, 0, 0,  0, 8, 0}
+        };
+        for (int r = 0; r < SIZE; r++) {
+            for (int c = 0; c < SIZE; c++) {
+                grid.fillCell(r, c, initial[r][c]);
+            }
+        }
+    }
+}
