@@ -6,15 +6,13 @@ import java.awt.Point;
  * TODO 4: FIll in your names and student IDs:
  *
  * Luca Bosch
- * 2201178
+ * @id ID
  * Sylvi Deng
  * 2252953
  */
 public class SudokuGrid {
-    public static final int SIZE = 9;
-    public static final int BOX_SIZE = 3;
-    public static final int MIN_DIGIT = 1;
-    public static final int MAX_DIGIT = 9;
+    private static final int SIZE = 9;
+    private static final int DIGIT_RANGE = 9;
 
     private int[][] grid;
     private int rEmpty;
@@ -68,6 +66,7 @@ public class SudokuGrid {
      */
     public void print() {
         System.out.println("+-----------------+");
+        int blockSize = SIZE / 3;
         for (int r = 0; r < SIZE; r++) {
             System.out.print("|");
             for (int c = 0; c < SIZE; c++) {
@@ -79,14 +78,14 @@ public class SudokuGrid {
                     symbol = (char) ('0' + value);
                 }
                 System.out.print(symbol);
-                if (c % BOX_SIZE == BOX_SIZE - 1) {
+                if (c % blockSize == blockSize - 1) {
                     System.out.print("|");
                 } else {
                     System.out.print(" ");
                 }
             }
             System.out.println();
-            if (r % BOX_SIZE == BOX_SIZE - 1) {
+            if (r % blockSize == blockSize - 1) {
                 System.out.println("+-----------------+");
             }
         }
@@ -122,6 +121,9 @@ public class SudokuGrid {
         if (d == 0) {
             return false;
         }
+        if (d < 1 || d > DIGIT_RANGE) {
+            return true;
+        }
         if (rowConflict(r, d)) {
             return true;
         }
@@ -153,10 +155,11 @@ public class SudokuGrid {
     }
 
     private boolean boxConflict(int r, int c, int d) {
-        int startRow = (r / BOX_SIZE) * BOX_SIZE;
-        int startCol = (c / BOX_SIZE) * BOX_SIZE;
-        for (int row = startRow; row < startRow + BOX_SIZE; row++) {
-            for (int col = startCol; col < startCol + BOX_SIZE; col++) {
+        int blockSize = SIZE / 3;
+        int startRow = (r / blockSize) * blockSize;
+        int startCol = (c / blockSize) * blockSize;
+        for (int row = startRow; row < startRow + blockSize; row++) {
+            for (int col = startCol; col < startCol + blockSize; col++) {
                 if (grid[row][col] == d) {
                     return true;
                 }
