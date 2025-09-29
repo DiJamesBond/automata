@@ -86,8 +86,10 @@ public class SudokuGrid {
                 }
             }
             System.out.println();
+            if (r % BOX_SIZE == BOX_SIZE - 1) {
+                System.out.println("+-----------------+");
+            }
         }
-        System.out.println("+-----------------+");
     }
 
     /**
