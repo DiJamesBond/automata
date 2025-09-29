@@ -1,0 +1,170 @@
+import java.awt.Point;
+
+/**
+ * SudokuGrid.
+ *
+ * TODO 4: FIll in your names and student IDs:
+ *
+ * Luca Bosch
+ * @id ID
+ * Sylvi Deng
+ * 2252953
+ */
+public class SudokuGrid {
+    private static final int SIZE = 9;
+    private static final int DIGIT_RANGE = 9;
+
+    private int[][] grid;
+    private int rEmpty;
+    private int cEmpty;
+
+    public SudokuGrid() {
+        grid = new int[SIZE][SIZE];
+        rEmpty = -1;
+        cEmpty = -1;
+    }
+
+    /**
+     * Creates a deep copy of this grid.
+     *
+     * @return a new SudokuGrid containing the same values
+     */
+    public SudokuGrid copy() {
+        SudokuGrid copy = new SudokuGrid();
+        for (int r = 0; r < SIZE; r++) {
+            for (int c = 0; c < SIZE; c++) {
+                copy.grid[r][c] = grid[r][c];
+            }
+        }
+        copy.rEmpty = rEmpty;
+        copy.cEmpty = cEmpty;
+        return copy;
+    }
+
+    /**
+     * Finds the first empty cell in reading order.
+     *
+     * @return a Point with the row and column of the empty cell, or null if none
+     */
+    public Point findEmptyCell() {
+        for (int r = 0; r < SIZE; r++) {
+            for (int c = 0; c < SIZE; c++) {
+                if (grid[r][c] == 0) {
+                    rEmpty = r;
+                    cEmpty = c;
+                    return new Point(r, c);
+                }
+            }
+        }
+        rEmpty = -1;
+        cEmpty = -1;
+        return null;
+    }
+
+    /**
+     * Prints the grid using the required ASCII layout.
+     */
+    public void print() {
+        System.out.println("+-----------------+");
+        int blockSize = SIZE / 3;
+        for (int r = 0; r < SIZE; r++) {
+            System.out.print("|");
+            for (int c = 0; c < SIZE; c++) {
+                int value = grid[r][c];
+                char symbol;
+                if (value == 0) {
+                    symbol = ' ';
+                } else {
+                    symbol = (char) ('0' + value);
+                }
+                System.out.print(symbol);
+                if (c % blockSize == blockSize - 1) {
+                    System.out.print("|");
+                } else {
+                    System.out.print(" ");
+                }
+            }
+            System.out.println();
+            if (r % blockSize == blockSize - 1) {
+                System.out.println("+-----------------+");
+            }
+        }
+    }
+
+    /**
+     * Fills a cell with the provided digit.
+     *
+     * @param r the row index
+     * @param c the column index
+     * @param d the digit to place (0 clears the cell)
+     */
+    public void fillCell(int r, int c, int d) {
+        grid[r][c] = d;
+        if (d == 0) {
+            rEmpty = r;
+            cEmpty = c;
+        } else if (rEmpty == r && cEmpty == c) {
+            rEmpty = -1;
+            cEmpty = -1;
+        }
+    }
+
+    /**
+     * Determines whether placing a digit causes a conflict.
+     *
+     * @param r the row index
+     * @param c the column index
+     * @param d the digit to test
+     * @return true if a conflict occurs, false otherwise
+     */
+    public boolean givesConflict(int r, int c, int d) {
+        if (d == 0) {
+            return false;
+        }
+        if (d < 1 || d > DIGIT_RANGE) {
+            return true;
+        }
+        if (rowConflict(r, d)) {
+            return true;
+        }
+        if (colConflict(c, d)) {
+            return true;
+        }
+        if (boxConflict(r, c, d)) {
+            return true;
+        }
+        return false;
+    }
+
+    private boolean rowConflict(int r, int d) {
+        for (int c = 0; c < SIZE; c++) {
+            if (grid[r][c] == d) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean colConflict(int c, int d) {
+        for (int r = 0; r < SIZE; r++) {
+            if (grid[r][c] == d) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean boxConflict(int r, int c, int d) {
+        int blockSize = SIZE / 3;
+        int startRow = (r / blockSize) * blockSize;
+        int startCol = (c / blockSize) * blockSize;
+        for (int row = startRow; row < startRow + blockSize; row++) {
+            for (int col = startCol; col < startCol + blockSize; col++) {
+                if (grid[row][col] == d) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+}
