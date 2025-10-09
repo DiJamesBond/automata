@@ -9,9 +9,12 @@ import javax.swing.*;
 
 public class Minesweeper {
     
-    int tileSize = 70;
-    int numRows = 8;
-    int numColums = 8;
+    int tileSize = 60;
+    int numRows = 10;
+    int numColums = numRows;
+    int boardWidth = numColums * tileSize;
+    int boardHeight = numRows * tileSize;
+    
 
     JFrame frame = new JFrame('Minesweeper');
 
